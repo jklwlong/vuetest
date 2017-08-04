@@ -1,34 +1,99 @@
-<!-- <template>
-  <el-row class="tac">
-  <el-col :span="8">
-    <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" theme="dark">
-      <el-submenu index="1">
-        <template slot="title"><i class="el-icon-message"></i>导航一</template>
-        <el-menu-item-group>
-          <template slot="title">分组一</template>
-          <el-menu-item index="1-1">选项1</el-menu-item>
-          <el-menu-item index="1-2">选项2</el-menu-item>
-        </el-menu-item-group>
-        <el-menu-item-group title="分组2">
-          <el-menu-item index="1-3">选项3</el-menu-item>
-        </el-menu-item-group>
-        <el-submenu index="1-4">
-          <template slot="title">选项4</template>
-          <el-menu-item index="1-4-1">选项1</el-menu-item>
-        </el-submenu>
-      </el-submenu>
-      <el-menu-item index="2"><i class="el-icon-menu"></i>导航二</el-menu-item>
-      <el-menu-item index="3"><i class="el-icon-setting"></i>导航三</el-menu-item>
-    </el-menu>
-  </el-col>
-</el-row>
-</template> -->
+<template>
+<div>
+  <div class="getbutton">
+    <el-button type="primary" @click="spider">获取数据</el-button>
+  </div>
+  <el-table :data="books" border style="width: 100%" v-loading="loading" element-loading-text="数据加载中" height="800">
+    <el-table-column label="序号" type="index" width="65">
+
+    </el-table-column>
+    <el-table-column label="日期" width="250">
+      <template scope="scope">
+        <el-icon name="time"></el-icon>
+        <span style="margin-left: 10px">{{ scope.row.publishTime }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column label="姓名" width="250">
+      <template scope="scope">
+        <el-popover trigger="hover" placement="top">
+          <p>姓名: {{ scope.row.name }}</p>
+          <p>地址: {{ scope.row.src }}</p>
+          <div slot="reference" class="name-wrapper">
+            <el-tag>{{ scope.row.name }}</el-tag>
+          </div>
+        </el-popover>
+      </template>
+    </el-table-column>
+    <el-table-column label="路径" width="500">
+      <template scope="scope">
+        <el-icon name="src"></el-icon>
+        <span style="margin-left: 10px">{{ scope.row.src }}</span>
+      </template>
+    </el-table-column>
+    <el-table-column label="操作">
+      <template scope="scope">
+        <el-button
+          size="small"
+          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+        <el-button
+          size="small"
+          type="danger"
+          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+      </template>
+    </el-table-column>
+  </el-table>
+</div>
+</template>
 
 <script>
 export default {
   name: 'spider',
-  data () {
+  data() {
+    return {
+      books: [],
+      loading: false
+    }
+  },
+  created() {
+    this.loading = true;
+  },
+  mounted() {
+    this.getlist();
+  },
+  methods: {
+    spider: function() {
+      this.loading = true;
+      this.$axios.post('https://localhost:8888/fetch', {
 
+        })
+        .then(response => {
+          console.log(response);
+          this.getlist();
+        })
+        .catch(response => {
+          console.log(response);
+        })
+    },
+    getlist: function() {
+      this.$axios.get('https://localhost:8888/users', {
+
+        })
+        .then(response => {
+          this.books = response.data.books;
+          this.loading = false;
+          console.log(this);
+          console.log(response);
+        })
+        .catch(response => {
+          console.log(response);
+        })
+    }
   }
 }
 </script>
+<style>
+  .getbutton{
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+</style>
