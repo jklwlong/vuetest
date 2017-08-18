@@ -38,17 +38,18 @@
       <template scope="scope">
         <el-button
           size="small"
-          @click="dialogFormVisible = true">编辑</el-button>
+          @click="findById(scope.row._id)">编辑</el-button>
         <el-button
           size="small"
           type="danger"
-          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          @click="delById(scope.row._id)">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
   <!-- 编辑按钮弹出 -->
   <el-dialog title="编辑" :visible.sync="dialogFormVisible" size="small">
   <el-form :model="form">
+      <el-input v-model="form.id" auto-complete="off" type="hidden"></el-input>
     <el-form-item label="名称" :label-width="formLabelWidth">
       <el-input v-model="form.name" auto-complete="off"></el-input>
     </el-form-item>
@@ -115,8 +116,6 @@ export default {
         .then(response => {
           this.books = response.data.books;
           this.loading = false;
-          console.log(this);
-          console.log(response);
         })
         .catch(response => {
           console.log(response);
@@ -124,32 +123,97 @@ export default {
     },
     //批量删除
     batchDel: function() {
-      console.log(this.$refs.multipleTable.selection);
-      // this.loading = true;
-      // this.$axios.post('https://localhost:8888/xxx', {
-      //
-      //   })
-      //   .then(response => {
-      //     this.getlist();
-      //   })
-      //   .catch(response => {
-      //     console.log(response);
-      //   })
+      var idArr = [];
+      var objs = this.$refs.multipleTable.selection;
+      for(var i=0;i<objs.length;i++){
+        idArr.push(objs[i]._id);
+      }
+      if(idArr.length == 0){
+        return;
+      }
+      this.$confirm('此操作将永久删除数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$axios.post('https://localhost:8888/users/batchDel', {
+          idArr:idArr
+        })
+        .then(response => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+          this.getlist();
+        })
+        .catch(response => {
+          console.log(response);
+        })
+          
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+    },
+    //单条删除
+    delById: function(id) {
+        this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$axios.post('https://localhost:8888/users/delById', {
+          id:id
+        })
+        .then(response => {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+          this.getlist();
+        })
+        .catch(response => {
+          console.log(response);
+        })
+          
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+
+    },
+    findById: function(id) {
+      this.dialogFormVisible = true;
+      this.$axios.post('https://localhost:8888/users/findById', {
+          id:id
+        })
+        .then(response => {
+          this.form.name = response.data.book.name;
+          this.form.src = response.data.book.src;
+          this.form.id = response.data.book._id;
+        })
+        .catch(response => {
+          console.log(response);
+        })
     },
     //编辑
     update: function() {
       this.dialogFormVisible = false
-      console.log(this);
-      // this.loading = true;
-      // this.$axios.post('https://localhost:8888/xxx', {
-      //
-      //   })
-      //   .then(response => {
-      //     this.getlist();
-      //   })
-      //   .catch(response => {
-      //     console.log(response);
-      //   })
+      this.$axios.post('https://localhost:8888/users/updateById', {
+          id:this.form.id,
+          name:this.form.name,
+          src:this.form.src
+        })
+        .then(response => {
+          this.getlist();
+        })
+        .catch(response => {
+          console.log(response);
+        })
     }
   }
 }
