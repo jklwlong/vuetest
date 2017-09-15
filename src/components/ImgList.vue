@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  name: 'imgList',
+  name: 'ImgList',
   data() {
     return {
       books: [],
@@ -36,7 +36,7 @@ export default {
           this.total = response.data.books.length;
           this.loading = false;
           console.log(this);
-          console.log(response);
+          console.log(this.$store.state.userinfo);
         })
         .catch(response => {
           console.log(response);

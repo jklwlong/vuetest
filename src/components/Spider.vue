@@ -4,6 +4,7 @@
   <div class="getbutton">
     <el-button size="small" type="primary" @click="spider">获取数据</el-button>
     <el-button size="small" type="primary" @click="batchDel">批量删除</el-button>
+    <el-button size="small" type="primary" @click="download">download</el-button>
   </div>
   <!-- 数据渲染表格 -->
   <el-table :data="books" border style="width: 100%" v-loading="loading" element-loading-text="数据加载中" height="800" ref="multipleTable">
@@ -94,6 +95,17 @@ export default {
     this.getlist();
   },
   methods: {
+    download: function() {
+      this.$axios.post('http://192.168.5.78:8080/user/test2.do', {
+
+        })
+        .then(response => {
+          console.log(response);
+        })
+        .catch(response => {
+          console.log(response);
+        })
+    },
     //获取数据
     spider: function() {
       this.loading = true;
@@ -114,6 +126,7 @@ export default {
 
         })
         .then(response => {
+          console.log(response);
           this.books = response.data.books;
           this.loading = false;
         })
